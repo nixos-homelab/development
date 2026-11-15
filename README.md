@@ -23,4 +23,9 @@ For the full list of module options, see [the options reference](https://nixos-h
 
 ## Modules
 
-None yet.
+- **forgejo**: Forgejo with its database in the `postgresql` module of
+  `homelab-storage`, local accounts only and registration closed. The web UI
+  and SSH share the address of its Gateway: HTTPS on 443, git over SSH on
+  port 22 to Forgejo's built-in SSH server. An admin user is created at
+  start, with a password `setup-secrets` generates into the Secret
+  `forgejo-secrets` (`ADMIN_PASSWORD`).

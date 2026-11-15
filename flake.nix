@@ -19,6 +19,16 @@
       inputs.setup-secrets.follows = "setup-secrets";
       inputs.kube-generators.follows = "kube-generators";
     };
+    homelab-storage = {
+      url = "github:nixos-homelab/storage";
+      inputs.systems.follows = "systems";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.setup-secrets.follows = "setup-secrets";
+      inputs.homelab-shared.follows = "homelab-shared";
+      inputs.kube-generators.follows = "kube-generators";
+      inputs.docs.follows = "docs";
+    };
     docs = {
       url = "github:andsens/nix-docs";
       inputs.systems.follows = "systems";
@@ -50,8 +60,10 @@
           lib = {
             importsApply = map (path: importApply path { inherit self inputs; });
           };
-          # Forgejo, its Actions runner and Renovate come here (one module each)
-          nixosModules = { };
+          nixosModules = {
+            forgejo = importApply ./nix/modules/forgejo { inherit self inputs; };
+            homepage = importApply ./nix/modules/homepage { inherit self inputs; };
+          };
         };
         perSystem =
           { pkgs, lib, ... }:
@@ -63,7 +75,15 @@
             '';
             checks.manifests = inputs.homelab-shared.lib.checks.manifests {
               inherit pkgs;
-              modules = lib.attrValues self.nixosModules;
+              modules = lib.attrValues self.nixosModules ++ [
+                {
+                  homelab = {
+                    postgresql.enable = true;
+                    forgejo.enable = true;
+                    homepage.enable = true;
+                  };
+                }
+              ];
             };
             packages = {
               options-docs = inputs.docs.lib.docs.options {
@@ -71,7 +91,13 @@
                 modules = lib.attrValues self.nixosModules;
                 repoPath = toString self;
                 repoLinkPrefix = "https://github.com/nixos-homelab/development/blob/main";
-                prefixGroups = { };
+                prefixGroups = {
+                  forgejo = [
+                    "homelab.forgejo"
+                    "homelab.homepage.integrations.forgejo"
+                  ];
+                  homepage = [ "homelab.homepage.sections" ];
+                };
               };
               manual-docs = inputs.docs.lib.mkdocs.manual {
                 inherit pkgs;

@@ -249,6 +249,44 @@
         "type": "github"
       }
     },
+    "homelab-storage": {
+      "inputs": {
+        "docs": [
+          "docs"
+        ],
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "homelab-shared": [
+          "homelab-shared"
+        ],
+        "kube-generators": [
+          "kube-generators"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "setup-secrets": [
+          "setup-secrets"
+        ],
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794697763,
+        "narHash": "sha256-Gcd0uUmJw3YNPwR9zqFCj1PHrBn8d/lwf8jX8nNZuF8=",
+        "owner": "nixos-homelab",
+        "repo": "storage",
+        "rev": "848d33caa55327966266f8399c5f48ebc2a4ec8a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos-homelab",
+        "repo": "storage",
+        "type": "github"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1784254960,
@@ -490,6 +528,7 @@
         "docs": "docs",
         "flake-parts": "flake-parts",
         "homelab-shared": "homelab-shared",
+        "homelab-storage": "homelab-storage",
         "kube-generators": "kube-generators_2",
         "nixpkgs": "nixpkgs",
         "setup-secrets": "setup-secrets",
