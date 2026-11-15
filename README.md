@@ -4,7 +4,7 @@ Software development on top of [nixos-homelab](https://github.com/nixos-homelab/
 a private Forgejo with its Actions runner in the cluster, and Renovate
 keeping the dependencies of its repositories up to date.
 
-For the full list of module options, see [the options reference](https://nixos-homelab.github.io/development/options/).
+For the full list of module options, see [the documentation](https://nixos-homelab.github.io/development/), under Options.
 
 ## Setup
 
