@@ -118,16 +118,13 @@ let
     config.Entrypoint = [ (lib.getExe start) ];
   };
   # Generated only when the Secret is missing, never when the API call fails
-  secretSource = description: field: generate: {
-    inherit description;
-    cmd = hllib.setup-secrets.mkScript pkgs ''
-      if [[ -n $(kubectl -n forgejo get secret forgejo-secrets --ignore-not-found -oname) ]]; then
-        getKubeSecret forgejo forgejo-secrets ${field}
-      else
-        ${generate}
-      fi
-    '';
-  };
+  secretSource =
+    description: field: generate:
+    hllib.setup-secrets.kubeSecretSource pkgs {
+      inherit description field generate;
+      namespace = "forgejo";
+      name = "forgejo-secrets";
+    };
   randomString = "head -c 1024 /dev/urandom | tr -dc A-Za-z0-9 | head -c 64";
 in
 {
@@ -155,7 +152,15 @@ in
     };
     settings = lib.mkOption {
       description = "app.ini settings by section, over those of the module. See the [config cheat sheet](https://forgejo.org/docs/v17.0/admin/config-cheat-sheet/).";
-      type = with lib.types; attrsOf (attrsOf (oneOf [ bool int str ]));
+      type =
+        with lib.types;
+        attrsOf (
+          attrsOf (oneOf [
+            bool
+            int
+            str
+          ])
+        );
       default = { };
       example = {
         repository.DEFAULT_BRANCH = "main";
@@ -178,27 +183,28 @@ in
     ];
     setup-secrets = {
       sources.FORGEJO_SECRET_KEY = secretSource "Forgejo Secret Key" "SECRET_KEY" randomString;
-      sources.FORGEJO_INTERNAL_TOKEN = secretSource "Forgejo Internal Token" "INTERNAL_TOKEN" randomString;
+      sources.FORGEJO_INTERNAL_TOKEN =
+        secretSource "Forgejo Internal Token" "INTERNAL_TOKEN"
+          randomString;
       # 32 bytes in unpadded base64url, the only form Forgejo takes
-      sources.FORGEJO_JWT_SECRET = secretSource "Forgejo JWT Secret" "JWT_SECRET" "head -c 32 /dev/urandom | base64 -w0 | tr '+/' '-_' | tr -d '='";
-      sources.FORGEJO_ADMIN_PASSWORD = secretSource "Forgejo admin password" "ADMIN_PASSWORD" randomString;
+      sources.FORGEJO_JWT_SECRET =
+        secretSource "Forgejo JWT Secret" "JWT_SECRET"
+          "head -c 32 /dev/urandom | base64 -w0 | tr '+/' '-_' | tr -d '='";
+      sources.FORGEJO_ADMIN_PASSWORD =
+        secretSource "Forgejo admin password" "ADMIN_PASSWORD"
+          randomString;
       destinations = [
-        {
+        (hllib.setup-secrets.kubeSecretDestination pkgs {
           logPrefix = "Forgejo (SECRET_KEY, INTERNAL_TOKEN, JWT_SECRET & ADMIN_PASSWORD)";
-          requires = [
-            "FORGEJO_SECRET_KEY"
-            "FORGEJO_INTERNAL_TOKEN"
-            "FORGEJO_JWT_SECRET"
-            "FORGEJO_ADMIN_PASSWORD"
-          ];
-          cmd = hllib.setup-secrets.mkScript pkgs ''
-            setKubeSecret forgejo forgejo-secrets \
-              SECRET_KEY "''${FORGEJO_SECRET_KEY:?}" \
-              INTERNAL_TOKEN "''${FORGEJO_INTERNAL_TOKEN:?}" \
-              JWT_SECRET "''${FORGEJO_JWT_SECRET:?}" \
-              ADMIN_PASSWORD "''${FORGEJO_ADMIN_PASSWORD:?}"
-          '';
-        }
+          namespace = "forgejo";
+          name = "forgejo-secrets";
+          data = {
+            SECRET_KEY = "FORGEJO_SECRET_KEY";
+            INTERNAL_TOKEN = "FORGEJO_INTERNAL_TOKEN";
+            JWT_SECRET = "FORGEJO_JWT_SECRET";
+            ADMIN_PASSWORD = "FORGEJO_ADMIN_PASSWORD";
+          };
+        })
       ];
     };
     homelab.kubernetes.submodules.instances.forgejo = {
@@ -269,7 +275,16 @@ in
                 sectionName = "forgejo-ssh";
               }
             ];
-            rules = [ { backendRefs = [ { name = "forgejo"; port = ports.ssh; } ]; } ];
+            rules = [
+              {
+                backendRefs = [
+                  {
+                    name = "forgejo";
+                    port = ports.ssh;
+                  }
+                ];
+              }
+            ];
           };
         };
       };

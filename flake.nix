@@ -18,6 +18,7 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.setup-secrets.follows = "setup-secrets";
       inputs.kube-generators.follows = "kube-generators";
+      inputs.homelab-monitoring.follows = "homelab-monitoring";
     };
     homelab-storage = {
       url = "github:nixos-homelab/storage";
@@ -27,6 +28,19 @@
       inputs.setup-secrets.follows = "setup-secrets";
       inputs.homelab-shared.follows = "homelab-shared";
       inputs.kube-generators.follows = "kube-generators";
+      inputs.homelab-monitoring.follows = "homelab-monitoring";
+      inputs.docs.follows = "docs";
+    };
+    # What shared's k3s module takes its log options from
+    homelab-monitoring = {
+      url = "github:nixos-homelab/monitoring";
+      inputs.systems.follows = "systems";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.setup-secrets.follows = "setup-secrets";
+      inputs.kube-generators.follows = "kube-generators";
+      inputs.homelab-shared.follows = "homelab-shared";
+      inputs.homelab-storage.follows = "homelab-storage";
       inputs.docs.follows = "docs";
     };
     docs = {
