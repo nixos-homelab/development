@@ -301,6 +301,9 @@
         "flake-parts": [
           "flake-parts"
         ],
+        "homelab-monitoring": [
+          "homelab-monitoring"
+        ],
         "homelab-shared": [
           "homelab-shared"
         ],
@@ -318,11 +321,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794697763,
-        "narHash": "sha256-Gcd0uUmJw3YNPwR9zqFCj1PHrBn8d/lwf8jX8nNZuF8=",
+        "lastModified": 1795033878,
+        "narHash": "sha256-7hj9odviU7I5g+TcKgry0up9q9UtaxBxVv/ZLWn2ltI=",
         "owner": "nixos-homelab",
         "repo": "storage",
-        "rev": "848d33caa55327966266f8399c5f48ebc2a4ec8a",
+        "rev": "250bdb215daecc6eb7bcd50bbf6dda7ca345da3f",
         "type": "github"
       },
       "original": {
